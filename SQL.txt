@@ -1,0 +1,169 @@
+tạo database:
+CREATE DATABASE Sqldbserver
+CREATE DATABASE Sqldbserver1
+CREATE DATABASE Sqldbserver2
+xóa database
+DROP DATABASE  Sqldbserver
+
+comment:
+--
+
+tạo bảng giáo viên với 2 thuộc tính
+CREATE TABLE giao vien
+(
+	MaGV NVARCHAR(10),
+	Name NVARCHAR(100)
+)
+
+sử dụng data nào
+USE Sqldbserver
+
+từ khóa GO: thực thi đoạn phía trước xong thì thực thi đoạn phía sau
+
+từ khóa DROP: xóa
+xóa bảng, loại bảng hocsinh ra khỏi danh sách
+DROP TABLE hocsinh
+
+Từ khóa AS được dùng để gán tên mới tạm thời cho một cột.
+
+chỉ xóa dữ liệu bảng:
+TRUNCATE_TABLE hocsinh
+
+từ khóa ALTER để sửa(thêm cột ngày sinh)
+ALTER TABLE hocsinh ADD(thêm) Ngaysinh(cột) DATE(kiểu dữ liệu)
+
+từ khóa CHECK để tự động kiểm tra dữ liệu nhập vào theo điều kiện. nếu không đúng với điều kiện thì báo lỗi
+Luong INT CHECK(Luong > 3000 )			: điều kiện để nhập lương vào bảng Luong > 3000
+
+
+từ khóa VIEW một bảng View giống như table nhưng bị ảnh hưởng bởi bảng gốc(bảng tạo ra nó)
+create VIEW TestView as select * from dbo.GIAOVIEN		: tạo bảng VIEW tên TestView từ bảng dbo.GIAOVIEN
+drop VIEW TestView 					: xóa bảng viên tên TestView
+Alter VIEW TestView as select HOTEN from dbo.GIAOVIEN	: update bảng VIew sửa đổi thành 1 cột HOTEN từ bảng giaovien
+create VIEW [Xin chào mọi người] as select * from dbo.GIAOVIEN	: tạo bảng VIEW tên Xin chào mọi người từ bảng dbo.GIAOVIEN
+
+
+SELECT HoTen INTO tableC FROM dbo.giaovien		: clone bảng giáo viên với tên tableC chứa cột dữ liệu HoTen
+SELECT * INTO tableC FROM dbo.giaovien, dbo.bomon	: clone 2 bảng giaovien và bomon chứa tất cả các dữ liệu cột của 2 bảng
+SELECT * INTO tableC FROM dbo.giaovien, dbo.bomon where 1 < 0	:với điều kiện sai thì tạo bảng chứa cột nhưng không chứa dữ liệu
+INSERT INTO CloneGV SELECT * FROM 	dbo.giaovien	: thêm dữ liệu vào bảng clone đã được tạo sẵn
+
+
+từ khóa GROUP BY MaGV				: gom nhóm
+từ khóa HAVING					: điều kiện của funtion kết hợp với group by
+từ khóa ORDER BY <trường> ASC				: phân loại dữ liệu theo thứ tự tăng dần
+từ khóa ORDER BY <trường> DSC				: phân loại dữ liệu theo thứ tự giảm dần
+---
+SELECT * FROM NHANVIEN				: truy vấn và sắp xếp theo thứ tự giảm dần theo trường TEN
+ORDER BY TEN DESC;
+--
+
+
+-Tạo index cho bảng
+-Tăng tốc độ tìm kiếm, nhưng chậm tốc độ thêm xóa sữa
+CREATE INDEX IndexName ON dbo.Nguoithan(MaGV)		: tạo index tên IndexName cho bảng dbo.NguoiThan với thuộc tính MaGV cho phép trùng nhau
+CREATE UNIQUE INDEX IndexName ON dbo.Nguoithan(MaGV)  :tạo index tên IndexName cho bảng dbo.NguoiThan với thuộc tính MaGV không trùng nhau
+
+
+- Kiểu dữ liệu tự định nghĩa. sau này thay đổi kiểu dữ liệu dễ dàng hơn
+EXEC sp_addtype 'NNAME', 'nvarchar(100)', 'Not null'		tạo kiểu dữ liệu tự định nghĩa
+EXEC sp_droptype 'NNAME'				xóa kiễu dữ liệu đã được tự định nghĩa
+
+
+từ khóa PRINT dùng để xuất ra thứ gì đó có giá trị đơn
+PRINT 123	: xuất ra 123
+
+
+từ khóa IDENTITY trường tự tăng
+ID  INT PRIMARY KEY INDETITY(5,10)		: biến ID có khóa chính, là trường tự tăng, giá trị ban đầu bằng 5, giá trị tiếp theo sẽ tự + 10
+
+
+từ khóa DECLARE dùng để tạo biến
+DECLARE @MaxLuong INT			: tạo biến tên @MaxLuong kiểu dữ liệu INT
+SET @MaxLuong = 2000			: gán giá trị cho biến @MaxLuong
+DECLARE @MinLuong INT = 3000		: tạo và khởi gán giá trị cho biến @MinLuong
+SELECT @MaxLuong = Max(Luong)  FROM  dbo.GIAOVIEN 	: khởi gán giá trị cho biến bằng câu truy vấn
+SELECT *  FROM  dbo.GIAOVIEN WHERE LUONG = @MaxLuong	: dùng biến để truy vấn
+
+
+từ khóa IF và ELSE				: nếu và khác
+từ khóa BEGIN và END			:thẻ hiện một khối lệnh
+WHILE( )	
+
+				: vòng lặp
+từ khóa SET để lưu giá trị vào biến
+set @may = 5
+
+
+CURSOR-Duyệt và xử lý record biến và cột của bảng phải cùng kiểu dữ liệu
+----------
+Declare  <Tên con trỏ> cursor for <câu select>
+Open <Tên con trỏ>
+FETCH NEXT FROM <Tên con trỏ> INTO <Danh sách các biến tương ứng kết quả truy vấn>
+WHILE @@FETCH_STATUS = 0
+BEGIN
+Câu lệnh thưc hiện
+FETCH NEXT lại lần nữa
+FETCH NEXT FROM <Tên con trỏ> INTO <Danh sách các biến tương ứng kết quả truy vấn>
+END
+CLOSE <Tên con trỏ>
+DELLOCATE <Tên con trỏ>
+-------
+
+
+STORED PROCEDURES
+-----Tạo store
+CREATE PROCEDURE <Tên store> 					CREATE PROCEDURE USP_Test
+[parameter nếu có](giống như tạo biến nhưng không có chữ Declare)				@MaGV nvarchar(10)
+AS								AS
+BEGIN								BEGIN
+	<code xử lý>						Select * from dbo.giaovien
+END								END
+----Thực thi Store
+EXEC USP_Test
+EXEC "USP Test"
+EXECUTE USP_Test
+EXECUTE "USP Test"
+
+
+FUNCTION
+----Tạo function
+CREATE FUNCTION UF_AgeOfYear(@year DATE)
+RETURNS int
+AS
+BEGIN
+	RETURNS YEAR(GETDATE()) - YEAR(@year)
+END
+----Thực thi
+SELECT dbo.UF_AgeOfYear('19990511')				LƯU Ý NÊN SỬ DỤNG từ khóa dbo.<tên function> để tránh bị lỗi
+
+
+Từ khóa ROLLBACK TRAN: để quay trở lại trạng thái trước khi có thay đổi.
+
+TRIGGER
+---Sau khi xử dụng lệnh insert, update ở bảng dbo.GiaoVien thì TRIGGER UTG_InsertGiaoVien sẽ chạy trước rồi mới tới lệnh insert, update của dbo.GIaoVien. kết hợp
+với từ khóa ROLLBACK TRAN để tối ưu câu lệnh
+-- Tạo Trigger
+CREATE TRIGGER UTG_InsertGiaoVien
+ON dbo.GiaoVien
+FOR INSERT, UPDATE
+AS
+BEGIN
+	<Code>
+END
+
+
+TRANSACTION
+----------------------
+BEGIN TRANSACTION <Tên transaction>				:bắt đầu transaction
+BEGIN TRANSACTION @Tran					:đặt tên TRANSACTION là @Tran
+	
+COMMIT TRANSACTION <Tên transaction>			: chấp nhận transaction
+COMMIT TRANSACTION @Tran				:chấp nhận các lệnh và tiến hành thực hiện TRANSACTION tên @Tran
+
+
+SAVE TRANSACTION <Tên vị trí lưu>				: lưu vị trí(đánh dấu)Lưu transaction
+SAVE TRANSACTION Trans					: tên vị trí lưu Tran
+
+ROLLBACK TRANSACTION <Tên vị trí lưu>			:trở lại vị trí đánh dấu. chỉ chưa COMMIT. khi đã COMMIT RỒI THÌ KHÔNG THỂ ROLLBACK
+ROLLBACK TRANSACTION Trans			: :trở lại vị trí đánh dấu Tran
